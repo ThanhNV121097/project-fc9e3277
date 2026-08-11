@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Todo List App v3 — Design Preview</title>
+<style>
+  :root {
+    --primary: #2563EB;
+    --primary-dark: #1D4ED8;
+    --primary-soft: #DBEAFE;
+    --accent: #10B981;
+    --accent-soft: #D1FAE5;
+    --danger: #EF4444;
+    --danger-soft: #FEE2E2;
+    --bg: #F9FAFB;
+    --surface: #FFFFFF;
+    --text: #0F172A;
+    --text-muted: #64748B;
+    --border: #E2E8F0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible { outline: 3px solid rgba(37, 99, 235, .45); outline-offset: 2px; border-radius: 6px; }
+  .container { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+
+  /* Header */
+  header.site { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 10; }
+  .site-inner { display: flex; align-items: center; justify-content: space-between; max-width: 680px; margin: 0 auto; padding: 0 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; }
+  .brand-mark { width: 30px; height: 30px; border-radius: 8px; background: var(--primary); display: grid; place-items: center; }
+  .nav-links { display: flex; gap: 6px; list-style: none; }
+  .nav-links a {
+    display: block; padding: 8px 12px; border-radius: 8px; text-decoration: none;
+    color: var(--text-muted); font-size: 14px; font-weight: 500; transition: background .15s, color .15s;
+  }
+  .nav-links a:hover { background: var(--primary-soft); color: var(--primary-dark); }
+  .nav-links a.active { background: var(--primary); color: #fff; }
+
+  /* Hero */
+  .hero { padding: 56px 0 12px; text-align: center; }
+  .hero h1 { font-size: 34px; letter-spacing: -0.5px; }
+  .hero h1 span { color: var(--primary); }
+  .hero p { color: var(--text-muted); margin-top: 8px; font-size: 16px; }
+
+  /* App card */
+  .app-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, .06); padding: 24px; margin: 28px 0 8px;
+  }
+  .app-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .app-head h2 { font-size: 19px; }
+  .count-badge {
+    font-size: 12.5px; font-weight: 600; color: var(--primary-dark);
+    background: var(--primary-soft); padding: 3px 10px; border-radius: 999px;
+  }
+  .app-sub { color: var(--text-muted); font-size: 13.5px; margin-bottom: 18px; }
+
+  /* Add form */
+  .add-row { display: flex; gap: 10px; }
+  .add-input {
+    flex: 1; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 15px; color: var(--text); background: #FCFDFE; transition: border-color .15s, box-shadow .15s;
+  }
+  .add-input::placeholder { color: #94A3B8; }
+  .add-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, .14); outline: none; }
+  .add-input.error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(239, 68, 68, .12); }
+  .field-error { color: var(--danger); font-size: 12.5px; margin-top: 6px; display: none; }
+  .field-error.show { display: block; animation: shake .25s ease; }
+  @keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px; border: none; cursor: pointer;
+    font-size: 14.5px; font-weight: 600; border-radius: 10px; padding: 12px 20px;
+    transition: transform .1s, background .15s;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-icon {
+    width: 34px; height: 34px; padding: 0; justify-content: center; border-radius: 8px;
+    background: transparent; color: var(--text-muted);
+  }
+  .btn-icon:hover { background: var(--danger-soft); color: var(--danger); }
+  .task.done .btn-icon:hover { background: var(--accent-soft); color: #059669; }
+
+  /* List + states */
+  .list-area { margin-top: 18px; }
+  .state-panel {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; padding: 34px 16px; text-align: center; color: var(--text-muted);
+  }
+  .state-panel h3 { color: var(--text); font-size: 16px; margin-top: 4px; }
+  .state-panel p { font-size: 13.5px; max-width: 300px; }
+  .state-panel .btn { margin-top: 10px; }
+  .spinner {
+    width: 26px; height: 26px; border: 3px solid var(--border); border-top-color: var(--primary);
+    border-radius: 50%; animation: spin .8s linear infinite; margin-bottom: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .task-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .task {
+    display: flex; align-items: center; gap: 12px; background: #F8FAFC;
+    border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px;
+    animation: slideIn .28s ease both;
+  }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .check {
+    width: 22px; height: 22px; border-radius: 50%; border: 2px solid #CBD5E1; background: #fff;
+    cursor: pointer; display: grid; place-items: center; flex: none; padding: 0;
+    transition: background .15s, border-color .15s, transform .1s;
+  }
+  .check:hover { border-color: var(--primary); transform: scale(1.08); }
+  .check svg { width: 12px; height: 12px; display: block; }
+  .task-label { flex: 1; font-size: 15px; transition: color .15s; word-break: break-word; }
+  .task.done { background: var(--accent-soft); border-color: #A7F3D0; }
+  .task.done .check { background: var(--accent); border-color: var(--accent); }
+  .task.done .task-label { text-decoration: line-through; color: #6B7280; }
+
+  .states-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 10px; }
+  .state-block { border: 1.5px dashed var(--border); border-radius: 12px; padding: 14px; background: #FCFDFE; }
+  .state-tag {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--text-muted); display: block; margin-bottom: 10px;
+  }
+  .task-list.static { gap: 6px; }
+  .task-list.static .task { animation: none; background: #fff; }
+  .error-state h3 { color: var(--danger); }
+
+  .foot { text-align: center; color: var(--text-muted); font-size: 13px; padding: 18px 0 56px; }
+
+  @media (max-width: 520px) {
+    .hero h1 { font-size: 26px; }
+    .app-card { padding: 18px; }
+    .add-row { flex-direction: column; }
+    .btn-primary { justify-content: center; }
+    .nav-links a { padding: 7px 9px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="site-inner">
+    <div class="brand">
+      <span class="brand-mark">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </span>
+      Todo List App v3
+    </div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="#app" class="active">App</a></li>
+        <li><a href="#states">States</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <h1>Get things done, <span>one task at a time.</span></h1>
+    <p>Add, complete and delete tasks — instantly. No login, no fuss.</p>
+  </section>
+
+  <!-- ================= Working app ================= -->
+  <section id="app" class="app-card">
+    <div class="app-head">
+      <h2>Today's tasks</h2>
+      <span class="count-badge" id="countBadge">0 tasks</span>
+    </div>
+    <p class="app-sub">Press Enter or click Add to create a task. Click the circle to complete, the trash icon to delete.</p>
+
+    <form class="add-row" id="addForm" novalidate>
+      <input class="add-input" id="taskInput" type="text" placeholder="What needs to be done?" maxlength="120" autocomplete="off" aria-label="New task">
+      <button class="btn btn-primary" type="submit" id="addBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Add
+      </button>
+    </form>
+    <p class="field-error" id="fieldError">Type a task first — it can't be empty.</p>
+
+    <div class="list-area" id="listArea">
+      <!-- loading -->
+      <div class="state-panel" id="loadingPanel" style="display:none">
+        <span class="spinner" aria-hidden="true"></span>
+        <p>Loading your tasks…</p>
+      </div>
+      <!-- empty -->
+      <div class="state-panel" id="emptyPanel" style="display:none">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+        <h3>All clear!</h3>
+        <p>You have no tasks yet. Add your first one above — it'll appear here instantly.</p>
+      </div>
+      <!-- list -->
+      <ul class="task-list" id="taskList" style="display:none"></ul>
+    </div>
+  </section>
+  <!-- ================= States showcase ================= -->
+  <section id="states" class="app-card">
+    <div class="app-head">
+      <h2>Design states</h2>
+      <span class="count-badge">reference</span>
+    </div>
+    <p class="app-sub">The app is a single page, so the states below are shown side by side for review — they represent what the list looks like as tasks change.</p>
+
+    <div class="states-grid">
+      <!-- Populated -->
+      <div class="state-block">
+        <span class="state-tag">Populated</span>
+        <ul class="task-list static">
+          <li class="task done">
+            <button class="check" aria-label="Mark not complete"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
+            <span class="task-label">Review the design preview</span>
+            <button class="btn-icon" aria-label="Delete task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+          </li>
+          <li class="task">
+            <button class="check" aria-label="Mark complete"></button>
+            <span class="task-label">Send feedback to the team</span>
+            <button class="btn-icon" aria-label="Delete task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+          </li>
+          <li class="task">
+            <button class="check" aria-label="Mark complete"></button>
+            <span class="task-label">Write the project brief</span>
+            <button class="btn-icon" aria-label="Delete task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Empty -->
+      <div class="state-block">
+        <span class="state-tag">Empty</span>
+        <div class="state-panel">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+          </svg>
+          <h3>All clear!</h3>
+          <p>No tasks yet — your list will live here.</p>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div class="state-block">
+        <span class="state-tag">Load error</span>
+        <div class="state-panel error-state">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+          </svg>
+          <h3>Couldn't load tasks</h3>
+          <p>Something went wrong while fetching your list.</p>
+          <button class="btn btn-primary" id="retryBtn">Try again</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p>Todo List App v3 — design preview. Tasks in the working demo above are saved in your browser only.</p>
+  </footer>
+  <script>
+    // ---- Working demo (in-browser only) ----
+    const input = document.getElementById('taskInput');
+    const form = document.getElementById('addForm');
+    const fieldError = document.getElementById('fieldError');
+    const list = document.getElementById('taskList');
+    const emptyPanel = document.getElementById('emptyPanel');
+    const loadingPanel = document.getElementById('loadingPanel');
+    const countBadge = document.getElementById('countBadge');
+
+    let tasks = [];
+
+    const TRASH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>';
+    const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+
+    function save() { try { localStorage.setItem('todo-demo-v3', JSON.stringify(tasks)); } catch (e) {} }
+    function load() {
+      try {
+        const raw = localStorage.getItem('todo-demo-v3');
+        tasks = raw ? JSON.parse(raw) : [];
+      } catch (e) { tasks = []; }
+    }
+
+    function render() {
+      list.innerHTML = '';
+      tasks.forEach(function (t, i) {
+        const li = document.createElement('li');
+        li.className = 'task' + (t.done ? ' done' : '');
+        li.style.animationDelay = Math.min(i * 30, 240) + 'ms';
+
+        const check = document.createElement('button');
+        check.className = 'check';
+        check.setAttribute('aria-label', t.done ? 'Mark as not complete' : 'Mark as complete');
+        if (t.done) check.innerHTML = CHECK_SVG;
+        check.addEventListener('click', function () { toggle(i); });
+
+        const label = document.createElement('span');
+        label.className = 'task-label';
+        label.textContent = t.text;
+
+        const del = document.createElement('button');
+        del.className = 'btn-icon';
+        del.setAttribute('aria-label', 'Delete task');
+        del.innerHTML = TRASH_SVG;
+        del.addEventListener('click', function () { remove(i); });
+
+        li.append(check, label, del);
+        list.appendChild(li);
+      });
+
+      const n = tasks.length;
+      countBadge.textContent = n + (n === 1 ? ' task' : ' tasks');
+      list.style.display = tasks.length ? 'block' : 'none';
+      emptyPanel.style.display = tasks.length ? 'none' : 'block';
+    }
+
+    function toggle(i) { tasks[i].done = !tasks[i].done; save(); render(); }
+    function remove(i) { tasks.splice(i, 1); save(); render(); }
+    function addTask(text) { tasks.unshift({ text: text, done: false }); save(); render(); }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) {
+        input.classList.add('error');
+        fieldError.classList.add('show');
+        input.focus();
+        return;
+      }
+      input.classList.remove('error');
+      fieldError.classList.remove('show');
+      addTask(text);
+      input.value = '';
+      input.focus();
+    });
+
+    input.addEventListener('input', function () {
+      if (input.value.trim()) { input.classList.remove('error'); fieldError.classList.remove('show'); }
+    });
+
+    // ---- Boot: brief loading state, then list ----
+    window.addEventListener('load', function () {
+      load();
+      loadingPanel.style.display = 'block';
+      setTimeout(function () {
+        loadingPanel.style.display = 'none';
+        render();
+        input.focus();
+      }, 700);
+    });
+
+    // Retry button on the error-state demo
+    document.getElementById('retryBtn').addEventListener('click', function () {
+      const btn = this;
+      btn.textContent = 'Retrying…';
+      btn.disabled = true;
+      setTimeout(function () {
+        btn.textContent = 'Try again';
+        btn.disabled = false;
+        btn.style.background = '#10B981';
+        btn.textContent = 'Restored ✓';
+        setTimeout(function () { btn.style.background = ''; btn.textContent = 'Try again'; }, 1600);
+      }, 900);
+    });
+
+    // Nav active state
+    const navLinks = document.querySelectorAll('.nav-links a');
+    navLinks.forEach(function (a) {
+      a.addEventListener('click', function () {
+        navLinks.forEach(function (x) { x.classList.remove('active'); });
+        a.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
